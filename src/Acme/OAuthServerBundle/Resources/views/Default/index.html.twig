@@ -1,0 +1,28 @@
+{% extends '::base.html.twig' %}
+
+{% block body %}
+    <h1>Demo page</h1>
+    Available Client:
+    <div>
+        <ul>
+            {% for client in clients %}
+                <li>
+                    <a href={{ path('acme_oauth_server_client', {'clientID': client.ID}) }}> {{ client.getName() }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div><a href="{{ path('user') }}">User profile</a></div>
+    <div><a href="{{ path('fos_user_registration_register') }}">User register</a></div>
+
+    {% if app.user %}
+        <a href="{{ path('fos_user_security_logout') }}">
+            <button>Logout</button>
+        </a>
+    {% else %}
+        <a href="{{ path('fos_user_security_login') }}">
+            <button>Login</button>
+        </a>
+    {% endif %}
+{% endblock %}
+

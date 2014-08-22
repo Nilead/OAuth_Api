@@ -1,0 +1,6 @@
+Acme\OAuthServerBundle\Entity\User:
+  exclusion_policy: ALL
+  properties:
+    id:
+        expose: true
+        groups: [ROLE_ID_ACCESS, ROLE_ALL_ACCESS]

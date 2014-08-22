@@ -1,0 +1,7 @@
+o_auth_server:
+    resource: "@OAuthServerBundle/Resources/config/routing.yml"
+    prefix:   /
+
+
+
+

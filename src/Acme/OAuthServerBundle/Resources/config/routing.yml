@@ -1,0 +1,31 @@
+#fos_user
+fos_user:
+        resource: "@OAuthServerBundle/Resources/config/routing/fos_user_bundle.yml"
+
+#fos_oauth
+fos_oauth:
+        resource: "@OAuthServerBundle/Resources/config/routing/fos_oauth_server_bundle.yml"
+
+#client
+acme_oauth_server_client:
+        pattern: /client/{clientID}
+        defaults: { _controller: OAuthServerBundle:Client:client }
+
+#homepage
+homepage:
+        pattern: /
+        defaults: { _controller: OAuthServerBundle:Demo:index }
+#user
+user:
+        pattern: /user
+        defaults: { _controller: OAuthServerBundle:User:user }
+
+#api
+#acme_api:
+#        pattern:  /api/users/{userID}
+#        defaults: { _controller: OAuthServerBundle:API:users }
+
+acme_api:
+    type: rest
+    prefix: /api
+    resource: "@OAuthServerBundle/Controller/APIController.php"

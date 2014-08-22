@@ -1,0 +1,68 @@
+{% extends '::base.html.twig' %}
+
+{% block body %}
+    <h1>Client page</h1>
+    <a href="{{ path('homepage') }}">Homepage</a>
+    <p>
+        Client_name: {{ client.name }}
+    </p>
+    <p>
+        Client_id: {{ client.getPublicId }}
+    </p>
+    <p>
+        Client_secret: {{ client.getSecret }}
+    </p>
+    <p>
+        Client_redirect_uri:
+    <ul>
+        {% for uri in client.redirectUris %}
+            <li>
+                {{ uri }}
+            </li>
+        {% endfor %}
+    </ul>
+    </p>
+    <p>
+        Grant type:
+    <ul>
+        {% for type in client.allowedGrantTypes %}
+            <li>
+                {{ type }}
+            </li>
+        {% endfor %}
+    </ul>
+    </p>
+    <p>
+        Info:
+    <blockquote>
+        {% if json == null %}
+            Permission not granted
+        {% else %}
+            {{ json }}
+        {% endif %}
+    </blockquote>
+    </p>
+    <form method="post" action="">
+        <select name="choice_access">
+            <option value="id_access">Id</option>
+            <option value="username_access">Username</option>
+            <option value="email_access">Email</option>
+            <option value="roles_access">Roles</option>
+            <option value="all_access">All</option>
+        </select>
+        {% if app.user %}
+            <button type="submit">Grant Access</button>
+        {% else %}
+            <button type="submit" disabled>Grant Access</button>
+        {% endif %}
+    </form>
+    {% if app.user %}
+        <a href="{{ path('fos_user_security_logout') }}">
+            <button>Logout</button>
+        </a>
+    {% else %}
+        <a href="{{ path('fos_user_security_login') }}">
+            <button>Login</button>
+        </a>
+    {% endif %}
+{% endblock %}
