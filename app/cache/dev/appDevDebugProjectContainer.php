@@ -38,6 +38,7 @@ class appDevDebugProjectContainer extends Container
             'a2371af0d8d97afb35fdf915a180c65b102f96e2f969f28f76965f0b1514df84_2' => 'getA2371af0d8d97afb35fdf915a180c65b102f96e2f969f28f76965f0b1514df842Service',
             'a2371af0d8d97afb35fdf915a180c65b102f96e2f969f28f76965f0b1514df84_3' => 'getA2371af0d8d97afb35fdf915a180c65b102f96e2f969f28f76965f0b1514df843Service',
             'annotation_reader' => 'getAnnotationReaderService',
+            'api_requester' => 'getApiRequesterService',
             'assetic.asset_factory' => 'getAssetic_AssetFactoryService',
             'assetic.asset_manager' => 'getAssetic_AssetManagerService',
             'assetic.cache' => 'getAssetic_CacheService',
@@ -207,6 +208,7 @@ class appDevDebugProjectContainer extends Container
             'monolog.logger.scream' => 'getMonolog_Logger_ScreamService',
             'monolog.logger.security' => 'getMonolog_Logger_SecurityService',
             'monolog.logger.templating' => 'getMonolog_Logger_TemplatingService',
+            'oauth_requester' => 'getOauthRequesterService',
             'profiler' => 'getProfilerService',
             'profiler_listener' => 'getProfilerListenerService',
             'property_accessor' => 'getPropertyAccessorService',
@@ -225,6 +227,7 @@ class appDevDebugProjectContainer extends Container
             'security.authentication.trust_resolver' => 'getSecurity_Authentication_TrustResolverService',
             'security.channel_listener' => 'getSecurity_ChannelListenerService',
             'security.context' => 'getSecurity_ContextService',
+            'security.context_listener.0' => 'getSecurity_ContextListener_0Service',
             'security.csrf.token_manager' => 'getSecurity_Csrf_TokenManagerService',
             'security.encoder_factory' => 'getSecurity_EncoderFactoryService',
             'security.firewall' => 'getSecurity_FirewallService',
@@ -406,6 +409,19 @@ class appDevDebugProjectContainer extends Container
     protected function getAnnotationReaderService()
     {
         return $this->services['annotation_reader'] = new \Doctrine\Common\Annotations\FileCacheReader(new \Doctrine\Common\Annotations\AnnotationReader(), 'C:/Users/Mr_Idiot/PhpstormProjects/OAuth/app/cache/dev/annotations', true);
+    }
+
+    /**
+     * Gets the 'api_requester' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return Acme\OAuthServerBundle\Requester\APIRequester A Acme\OAuthServerBundle\Requester\APIRequester instance.
+     */
+    protected function getApiRequesterService()
+    {
+        return $this->services['api_requester'] = new \Acme\OAuthServerBundle\Requester\APIRequester($this->get('router'), 'http://tuanvuong.local/');
     }
 
     /**
@@ -1559,7 +1575,7 @@ class appDevDebugProjectContainer extends Container
      */
     protected function getFosOauthServer_ServerService()
     {
-        return $this->services['fos_oauth_server.server'] = new \OAuth2\OAuth2($this->get('fos_oauth_server.storage'), array('supported_scopes' => 'id_access username_access email_access roles_access all_access'));
+        return $this->services['fos_oauth_server.server'] = new \OAuth2\OAuth2($this->get('fos_oauth_server.storage'), array('supported_scopes' => 'id_access username_access email_access roles_access all_access dob_access'));
     }
 
     /**
@@ -2722,6 +2738,19 @@ class appDevDebugProjectContainer extends Container
     }
 
     /**
+     * Gets the 'oauth_requester' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return Acme\OAuthServerBundle\Requester\OAuthRequester A Acme\OAuthServerBundle\Requester\OAuthRequester instance.
+     */
+    protected function getOauthRequesterService()
+    {
+        return $this->services['oauth_requester'] = new \Acme\OAuthServerBundle\Requester\OAuthRequester($this->get('router'), 'http://tuanvuong.local/');
+    }
+
+    /**
      * Gets the 'profiler' service.
      *
      * This service is shared.
@@ -2951,7 +2980,7 @@ class appDevDebugProjectContainer extends Container
         $a = $this->get('security.context');
         $b = $this->get('fos_oauth_server.server');
 
-        return $this->services['security.firewall.map.context.api'] = new \Symfony\Bundle\SecurityBundle\Security\FirewallContext(array(0 => $this->get('security.channel_listener'), 1 => new \FOS\OAuthServerBundle\Security\Firewall\OAuthListener($a, $this->get('security.authentication.manager'), $b), 2 => $this->get('security.access_listener')), new \Symfony\Component\Security\Http\Firewall\ExceptionListener($a, $this->get('security.authentication.trust_resolver'), $this->get('security.http_utils'), 'api', new \FOS\OAuthServerBundle\Security\EntryPoint\OAuthEntryPoint($b), NULL, NULL, $this->get('monolog.logger.security', ContainerInterface::NULL_ON_INVALID_REFERENCE)));
+        return $this->services['security.firewall.map.context.api'] = new \Symfony\Bundle\SecurityBundle\Security\FirewallContext(array(0 => $this->get('security.channel_listener'), 1 => $this->get('security.context_listener.0'), 2 => new \FOS\OAuthServerBundle\Security\Firewall\OAuthListener($a, $this->get('security.authentication.manager'), $b), 3 => $this->get('security.access_listener')), new \Symfony\Component\Security\Http\Firewall\ExceptionListener($a, $this->get('security.authentication.trust_resolver'), $this->get('security.http_utils'), 'api', new \FOS\OAuthServerBundle\Security\EntryPoint\OAuthEntryPoint($b), NULL, NULL, $this->get('monolog.logger.security', ContainerInterface::NULL_ON_INVALID_REFERENCE)));
     }
 
     /**
@@ -2977,19 +3006,18 @@ class appDevDebugProjectContainer extends Container
      */
     protected function getSecurity_Firewall_Map_Context_MainService()
     {
-        $a = $this->get('security.context');
-        $b = $this->get('monolog.logger.security', ContainerInterface::NULL_ON_INVALID_REFERENCE);
-        $c = $this->get('debug.event_dispatcher', ContainerInterface::NULL_ON_INVALID_REFERENCE);
-        $d = $this->get('security.http_utils');
-        $e = $this->get('http_kernel');
+        $a = $this->get('security.http_utils');
+        $b = $this->get('security.context');
+        $c = $this->get('http_kernel');
+        $d = $this->get('monolog.logger.security', ContainerInterface::NULL_ON_INVALID_REFERENCE);
 
-        $f = new \Symfony\Component\Security\Http\Firewall\LogoutListener($a, $d, new \Symfony\Component\Security\Http\Logout\DefaultLogoutSuccessHandler($d, '/'), array('csrf_parameter' => '_csrf_token', 'intention' => 'logout', 'logout_path' => '/logout'));
-        $f->addHandler(new \Symfony\Component\Security\Http\Logout\SessionLogoutHandler());
+        $e = new \Symfony\Component\Security\Http\Firewall\LogoutListener($b, $a, new \Symfony\Component\Security\Http\Logout\DefaultLogoutSuccessHandler($a, '/'), array('csrf_parameter' => '_csrf_token', 'intention' => 'logout', 'logout_path' => '/logout'));
+        $e->addHandler(new \Symfony\Component\Security\Http\Logout\SessionLogoutHandler());
 
-        $g = new \Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler($d, array('login_path' => '/login', 'always_use_default_target_path' => false, 'default_target_path' => '/', 'target_path_parameter' => '_target_path', 'use_referer' => false));
-        $g->setProviderKey('main');
+        $f = new \Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler($a, array('login_path' => '/login', 'always_use_default_target_path' => false, 'default_target_path' => '/', 'target_path_parameter' => '_target_path', 'use_referer' => false));
+        $f->setProviderKey('main');
 
-        return $this->services['security.firewall.map.context.main'] = new \Symfony\Bundle\SecurityBundle\Security\FirewallContext(array(0 => $this->get('security.channel_listener'), 1 => new \Symfony\Component\Security\Http\Firewall\ContextListener($a, array(0 => $this->get('security.user.provider.concrete.in_memory'), 1 => $this->get('fos_user.user_provider.username')), 'main', $b, $c), 2 => $f, 3 => new \Symfony\Component\Security\Http\Firewall\UsernamePasswordFormAuthenticationListener($a, $this->get('security.authentication.manager'), $this->get('security.authentication.session_strategy'), $d, 'main', $g, new \Symfony\Component\Security\Http\Authentication\DefaultAuthenticationFailureHandler($e, $d, array('login_path' => '/login', 'failure_path' => NULL, 'failure_forward' => false, 'failure_path_parameter' => '_failure_path'), $b), array('check_path' => '/login_check', 'use_forward' => false, 'require_previous_session' => true, 'username_parameter' => '_username', 'password_parameter' => '_password', 'csrf_parameter' => '_csrf_token', 'intention' => 'authenticate', 'post_only' => true), $b, $c, NULL), 4 => new \Symfony\Component\Security\Http\Firewall\AnonymousAuthenticationListener($a, '53f713a12d4a5', $b), 5 => $this->get('security.access_listener')), new \Symfony\Component\Security\Http\Firewall\ExceptionListener($a, $this->get('security.authentication.trust_resolver'), $d, 'main', new \Symfony\Component\Security\Http\EntryPoint\FormAuthenticationEntryPoint($e, $d, '/login', false), NULL, NULL, $b));
+        return $this->services['security.firewall.map.context.main'] = new \Symfony\Bundle\SecurityBundle\Security\FirewallContext(array(0 => $this->get('security.channel_listener'), 1 => $this->get('security.context_listener.0'), 2 => $e, 3 => new \Symfony\Component\Security\Http\Firewall\UsernamePasswordFormAuthenticationListener($b, $this->get('security.authentication.manager'), $this->get('security.authentication.session_strategy'), $a, 'main', $f, new \Symfony\Component\Security\Http\Authentication\DefaultAuthenticationFailureHandler($c, $a, array('login_path' => '/login', 'failure_path' => NULL, 'failure_forward' => false, 'failure_path_parameter' => '_failure_path'), $d), array('check_path' => '/login_check', 'use_forward' => false, 'require_previous_session' => true, 'username_parameter' => '_username', 'password_parameter' => '_password', 'csrf_parameter' => '_csrf_token', 'intention' => 'authenticate', 'post_only' => true), $d, $this->get('debug.event_dispatcher', ContainerInterface::NULL_ON_INVALID_REFERENCE), NULL), 4 => new \Symfony\Component\Security\Http\Firewall\AnonymousAuthenticationListener($b, '540033735ccde', $d), 5 => $this->get('security.access_listener')), new \Symfony\Component\Security\Http\Firewall\ExceptionListener($b, $this->get('security.authentication.trust_resolver'), $a, 'main', new \Symfony\Component\Security\Http\EntryPoint\FormAuthenticationEntryPoint($c, $a, '/login', false), NULL, NULL, $d));
     }
 
     /**
@@ -3005,7 +3033,7 @@ class appDevDebugProjectContainer extends Container
         $a = $this->get('security.context');
         $b = $this->get('monolog.logger.security', ContainerInterface::NULL_ON_INVALID_REFERENCE);
 
-        return $this->services['security.firewall.map.context.oauth_authorize'] = new \Symfony\Bundle\SecurityBundle\Security\FirewallContext(array(0 => $this->get('security.channel_listener'), 1 => new \Symfony\Component\Security\Http\Firewall\ContextListener($a, array(0 => $this->get('security.user.provider.concrete.in_memory'), 1 => $this->get('fos_user.user_provider.username')), 'oauth_authorize', $b, $this->get('debug.event_dispatcher', ContainerInterface::NULL_ON_INVALID_REFERENCE)), 2 => new \Symfony\Component\Security\Http\Firewall\AnonymousAuthenticationListener($a, '53f713a12d4a5', $b), 3 => $this->get('security.access_listener')), new \Symfony\Component\Security\Http\Firewall\ExceptionListener($a, $this->get('security.authentication.trust_resolver'), $this->get('security.http_utils'), 'oauth_authorize', NULL, NULL, NULL, $b));
+        return $this->services['security.firewall.map.context.oauth_authorize'] = new \Symfony\Bundle\SecurityBundle\Security\FirewallContext(array(0 => $this->get('security.channel_listener'), 1 => new \Symfony\Component\Security\Http\Firewall\ContextListener($a, array(0 => $this->get('security.user.provider.concrete.in_memory'), 1 => $this->get('fos_user.user_provider.username')), 'oauth_authorize', $b, $this->get('debug.event_dispatcher', ContainerInterface::NULL_ON_INVALID_REFERENCE)), 2 => new \Symfony\Component\Security\Http\Firewall\AnonymousAuthenticationListener($a, '540033735ccde', $b), 3 => $this->get('security.access_listener')), new \Symfony\Component\Security\Http\Firewall\ExceptionListener($a, $this->get('security.authentication.trust_resolver'), $this->get('security.http_utils'), 'oauth_authorize', NULL, NULL, NULL, $b));
     }
 
     /**
@@ -4493,7 +4521,7 @@ class appDevDebugProjectContainer extends Container
     {
         $a = $this->get('security.user_checker');
 
-        $this->services['security.authentication.manager'] = $instance = new \Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager(array(0 => new \FOS\OAuthServerBundle\Security\Authentication\Provider\OAuthProvider($this->get('security.user.provider.concrete.in_memory'), $this->get('fos_oauth_server.server'), $a), 1 => new \Symfony\Component\Security\Core\Authentication\Provider\DaoAuthenticationProvider($this->get('fos_user.user_provider.username'), $a, 'main', $this->get('security.encoder_factory'), true), 2 => new \Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticationProvider('53f713a12d4a5'), 3 => new \Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticationProvider('53f713a12d4a5')), true);
+        $this->services['security.authentication.manager'] = $instance = new \Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager(array(0 => new \FOS\OAuthServerBundle\Security\Authentication\Provider\OAuthProvider($this->get('security.user.provider.concrete.in_memory'), $this->get('fos_oauth_server.server'), $a), 1 => new \Symfony\Component\Security\Core\Authentication\Provider\DaoAuthenticationProvider($this->get('fos_user.user_provider.username'), $a, 'main', $this->get('security.encoder_factory'), true), 2 => new \Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticationProvider('540033735ccde'), 3 => new \Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticationProvider('540033735ccde')), true);
 
         $instance->setEventDispatcher($this->get('debug.event_dispatcher'));
 
@@ -4549,6 +4577,23 @@ class appDevDebugProjectContainer extends Container
     protected function getSecurity_ChannelListenerService()
     {
         return $this->services['security.channel_listener'] = new \Symfony\Component\Security\Http\Firewall\ChannelListener($this->get('security.access_map'), new \Symfony\Component\Security\Http\EntryPoint\RetryAuthenticationEntryPoint(80, 443), $this->get('monolog.logger.security', ContainerInterface::NULL_ON_INVALID_REFERENCE));
+    }
+
+    /**
+     * Gets the 'security.context_listener.0' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * This service is private.
+     * If you want to be able to request this service from the container directly,
+     * make it public, otherwise you might end up with broken code.
+     *
+     * @return Symfony\Component\Security\Http\Firewall\ContextListener A Symfony\Component\Security\Http\Firewall\ContextListener instance.
+     */
+    protected function getSecurity_ContextListener_0Service()
+    {
+        return $this->services['security.context_listener.0'] = new \Symfony\Component\Security\Http\Firewall\ContextListener($this->get('security.context'), array(0 => $this->get('security.user.provider.concrete.in_memory'), 1 => $this->get('fos_user.user_provider.username')), 'main_context', $this->get('monolog.logger.security', ContainerInterface::NULL_ON_INVALID_REFERENCE), $this->get('debug.event_dispatcher', ContainerInterface::NULL_ON_INVALID_REFERENCE));
     }
 
     /**
@@ -5328,7 +5373,7 @@ class appDevDebugProjectContainer extends Container
             'fos_oauth_server.security.authentication.listener.class' => 'FOS\\OAuthServerBundle\\Security\\Firewall\\OAuthListener',
             'fos_oauth_server.security.entry_point.class' => 'FOS\\OAuthServerBundle\\Security\\EntryPoint\\OAuthEntryPoint',
             'fos_oauth_server.server.options' => array(
-                'supported_scopes' => 'id_access username_access email_access roles_access all_access',
+                'supported_scopes' => 'id_access username_access email_access roles_access all_access dob_access',
             ),
             'fos_oauth_server.model_manager_name' => NULL,
             'fos_oauth_server.model.client.class' => 'Acme\\OAuthServerBundle\\Entity\\Client',
@@ -5342,6 +5387,10 @@ class appDevDebugProjectContainer extends Container
                 0 => 'Authorize',
                 1 => 'Default',
             ),
+            'oauth_requester_class' => 'Acme\\OAuthServerBundle\\Requester\\OAuthRequester',
+            'oauth_server_host' => 'http://tuanvuong.local/',
+            'api_requester_class' => 'Acme\\OAuthServerBundle\\Requester\\APIRequester',
+            'api_server_host' => 'http://tuanvuong.local/',
             'fos_rest.serializer.exclusion_strategy.version' => '',
             'fos_rest.serializer.exclusion_strategy.groups' => '',
             'fos_rest.view_handler.jsonp.callback_param' => '',

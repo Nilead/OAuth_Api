@@ -11,6 +11,10 @@ acme_oauth_server_client:
         pattern: /client/{clientID}
         defaults: { _controller: OAuthServerBundle:Client:client }
 
+acme_oauth_client_create:
+        pattern: /createClient
+        defaults: { _controller: OAuthServerBundle:Demo:createClient }
+
 #homepage
 homepage:
         pattern: /

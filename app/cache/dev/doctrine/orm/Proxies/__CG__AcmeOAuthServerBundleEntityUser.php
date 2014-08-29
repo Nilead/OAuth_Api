@@ -64,10 +64,10 @@ class User extends \Acme\OAuthServerBundle\Entity\User implements \Doctrine\ORM\
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'username', 'usernameCanonical', 'email', 'emailCanonical', 'enabled', 'salt', 'password', 'plainPassword', 'lastLogin', 'confirmationToken', 'passwordRequestedAt', 'groups', 'locked', 'expired', 'expiresAt', 'roles', 'credentialsExpired', 'credentialsExpireAt');
+            return array('__isInitialized__', 'id', 'dob', 'username', 'usernameCanonical', 'email', 'emailCanonical', 'enabled', 'salt', 'password', 'plainPassword', 'lastLogin', 'confirmationToken', 'passwordRequestedAt', 'groups', 'locked', 'expired', 'expiresAt', 'roles', 'credentialsExpired', 'credentialsExpireAt');
         }
 
-        return array('__isInitialized__', 'id', 'username', 'usernameCanonical', 'email', 'emailCanonical', 'enabled', 'salt', 'password', 'plainPassword', 'lastLogin', 'confirmationToken', 'passwordRequestedAt', 'groups', 'locked', 'expired', 'expiresAt', 'roles', 'credentialsExpired', 'credentialsExpireAt');
+        return array('__isInitialized__', 'id', 'dob', 'username', 'usernameCanonical', 'email', 'emailCanonical', 'enabled', 'salt', 'password', 'plainPassword', 'lastLogin', 'confirmationToken', 'passwordRequestedAt', 'groups', 'locked', 'expired', 'expiresAt', 'roles', 'credentialsExpired', 'credentialsExpireAt');
     }
 
     /**
@@ -173,6 +173,28 @@ class User extends \Acme\OAuthServerBundle\Entity\User implements \Doctrine\ORM\
     }
 
     
+    /**
+     * {@inheritDoc}
+     */
+    public function setDob($dob)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setDob', array($dob));
+
+        return parent::setDob($dob);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getDob()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getDob', array());
+
+        return parent::getDob();
+    }
+
     /**
      * {@inheritDoc}
      */

@@ -15,10 +15,13 @@ namespace Acme\OAuthServerBundle\Controller;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\SerializationContext;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use OAuth2\OAuth2AuthenticateException;
 use Doctrine\ORM\EntityManager;
 use FOS\OAuthServerBundle\Model\TokenManager;
 use Acme\OAuthServerBundle\Entity\AccessToken;
+use OAuth2\OAuth2;
 
 class APIController extends Controller
 {
@@ -28,6 +31,7 @@ class APIController extends Controller
      *      -> Method: get
      *      -> Route: user/{userID}
      *      -> Route name: get_user
+     * Can only be access from Access Token
      *
      * @param $userID
      *
@@ -37,6 +41,26 @@ class APIController extends Controller
      */
     public function getUserAction($userID)
     {
+        /**
+         * Require access token
+         * Else throw exception
+         */
+        if (! is_a(
+            $this->container->get('security.context')->getToken(),
+            'FOS\OAuthServerBundle\Security\Authentication\Token\OAuthToken'
+        )
+        ) {
+            $exception = new OAuth2AuthenticateException(
+                OAuth2::HTTP_UNAUTHORIZED,
+                OAuth2::TOKEN_TYPE_BEARER,
+                'access_denied',
+                'OAuth2 authentication required'
+            );
+
+            return $exception->getHttpResponse();
+        }
+
+
         /**
          * @var TokenManager $tokenManager
          */
@@ -54,7 +78,7 @@ class APIController extends Controller
         /**
          * Check for user exist
          */
-        if (!is_object($accessToken->getUser())) {
+        if (! is_object($accessToken->getUser())) {
             throw $this->createNotFoundException();
         }
         /**
@@ -82,8 +106,10 @@ class APIController extends Controller
             $context->setGroups("ROLE_ID_ACCESS");
         } else if ($this->container->get('security.context')->isGranted('ROLE_EMAIL_ACCESS')) {
             $context->setGroups("ROLE_EMAIL_ACCESS");
-        } else if ($this->container->get('security.context')->isGranted('ROLE_USERNAME_ACCESS')        ) {
+        } else if ($this->container->get('security.context')->isGranted('ROLE_USERNAME_ACCESS')) {
             $context->setGroups("ROLE_USERNAME_ACCESS");
+        } else if ($this->container->get('security.context')->isGranted('ROLE_DOB_ACCESS')) {
+            $context->setGroups("ROLE_DOB_ACCESS");
         } else if ($this->container->get('security.context')->isGranted('ROLE_ROLES_ACCESS')) {
             $context->setGroups("ROLE_ROLES_ACCESS");
         } else if ($this->container->get('security.context')->isGranted('ROLE_ALL_ACCESS')) {
@@ -96,5 +122,16 @@ class APIController extends Controller
             ->setSerializationContext($context);
 
         return $this->get('fos_rest.view_handler')->handle($view);
+    }
+
+    /**
+     * Sample API Interface
+     * Can be access from User Session
+     *
+     * @return Response
+     */
+    public function getFreeToAccessAction()
+    {
+        return new Response('Everyone who has logged in can access to this Api');
     }
 }

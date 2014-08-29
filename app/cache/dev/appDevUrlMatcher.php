@@ -322,9 +322,17 @@ class appDevUrlMatcher extends Symfony\Bundle\FrameworkBundle\Routing\Redirectab
 
         }
 
-        // acme_oauth_server_client
-        if (0 === strpos($pathinfo, '/client') && preg_match('#^/client/(?P<clientID>[^/]++)$#s', $pathinfo, $matches)) {
-            return $this->mergeDefaults(array_replace($matches, array('_route' => 'acme_oauth_server_client')), array (  '_controller' => 'Acme\\OAuthServerBundle\\Controller\\ClientController::clientAction',));
+        if (0 === strpos($pathinfo, '/c')) {
+            // acme_oauth_server_client
+            if (0 === strpos($pathinfo, '/client') && preg_match('#^/client/(?P<clientID>[^/]++)$#s', $pathinfo, $matches)) {
+                return $this->mergeDefaults(array_replace($matches, array('_route' => 'acme_oauth_server_client')), array (  '_controller' => 'Acme\\OAuthServerBundle\\Controller\\ClientController::clientAction',));
+            }
+
+            // acme_oauth_client_create
+            if ($pathinfo === '/createClient') {
+                return array (  '_controller' => 'Acme\\OAuthServerBundle\\Controller\\DemoController::createClientAction',  '_route' => 'acme_oauth_client_create',);
+            }
+
         }
 
         // homepage
@@ -341,16 +349,30 @@ class appDevUrlMatcher extends Symfony\Bundle\FrameworkBundle\Routing\Redirectab
             return array (  '_controller' => 'Acme\\OAuthServerBundle\\Controller\\UserController::userAction',  '_route' => 'user',);
         }
 
-        // get_user
-        if (0 === strpos($pathinfo, '/api/users') && preg_match('#^/api/users/(?P<userID>[^/]++)$#s', $pathinfo, $matches)) {
-            if (!in_array($this->context->getMethod(), array('GET', 'HEAD'))) {
-                $allow = array_merge($allow, array('GET', 'HEAD'));
-                goto not_get_user;
-            }
+        if (0 === strpos($pathinfo, '/api')) {
+            // get_user
+            if (0 === strpos($pathinfo, '/api/users') && preg_match('#^/api/users/(?P<userID>[^/]++)$#s', $pathinfo, $matches)) {
+                if (!in_array($this->context->getMethod(), array('GET', 'HEAD'))) {
+                    $allow = array_merge($allow, array('GET', 'HEAD'));
+                    goto not_get_user;
+                }
 
-            return $this->mergeDefaults(array_replace($matches, array('_route' => 'get_user')), array (  '_controller' => 'Acme\\OAuthServerBundle\\Controller\\APIController::getUserAction',  '_format' => 'json',));
+                return $this->mergeDefaults(array_replace($matches, array('_route' => 'get_user')), array (  '_controller' => 'Acme\\OAuthServerBundle\\Controller\\APIController::getUserAction',  '_format' => 'json',));
+            }
+            not_get_user:
+
+            // get_free_to_access
+            if ($pathinfo === '/api/free/to/access') {
+                if (!in_array($this->context->getMethod(), array('GET', 'HEAD'))) {
+                    $allow = array_merge($allow, array('GET', 'HEAD'));
+                    goto not_get_free_to_access;
+                }
+
+                return array (  '_controller' => 'Acme\\OAuthServerBundle\\Controller\\APIController::getFreeToAccessAction',  '_format' => 'json',  '_route' => 'get_free_to_access',);
+            }
+            not_get_free_to_access:
+
         }
-        not_get_user:
 
         throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new ResourceNotFoundException();
     }

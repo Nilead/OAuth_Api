@@ -29,6 +29,27 @@ class User extends BaseUser
     protected $id;
 
     /**
+     * @ORM\Column(type="date", nullable=true)
+     */
+    protected $dob;
+
+    /**
+     * @param mixed $dob
+     */
+    public function setDob($dob)
+    {
+        $this->dob = $dob;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDob()
+    {
+        return $this->dob;
+    }
+
+    /**
      * @param mixed $id
      */
     public function setId($id)

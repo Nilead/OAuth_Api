@@ -121,26 +121,27 @@ class __TwigTemplate_bfbce1733f3ac706195184c76b031d6d83c3ed74ff5fbc069bae2f85ca9
             <option value=\"id_access\">Id</option>
             <option value=\"username_access\">Username</option>
             <option value=\"email_access\">Email</option>
+            <option value=\"dob_access\">Date of Birth</option>
             <option value=\"roles_access\">Roles</option>
             <option value=\"all_access\">All</option>
         </select>
         ";
-        // line 53
+        // line 54
         if ($this->getAttribute((isset($context["app"]) ? $context["app"] : $this->getContext($context, "app")), "user")) {
-            // line 54
+            // line 55
             echo "            <button type=\"submit\">Grant Access</button>
         ";
         } else {
-            // line 56
+            // line 57
             echo "            <button type=\"submit\" disabled>Grant Access</button>
         ";
         }
-        // line 58
+        // line 59
         echo "    </form>
     ";
-        // line 59
+        // line 60
         if ($this->getAttribute((isset($context["app"]) ? $context["app"] : $this->getContext($context, "app")), "user")) {
-            // line 60
+            // line 61
             echo "        <a href=\"";
             echo $this->env->getExtension('routing')->getPath("fos_user_security_logout");
             echo "\">
@@ -148,7 +149,7 @@ class __TwigTemplate_bfbce1733f3ac706195184c76b031d6d83c3ed74ff5fbc069bae2f85ca9
         </a>
     ";
         } else {
-            // line 64
+            // line 65
             echo "        <a href=\"";
             echo $this->env->getExtension('routing')->getPath("fos_user_security_login");
             echo "\">
@@ -170,6 +171,6 @@ class __TwigTemplate_bfbce1733f3ac706195184c76b031d6d83c3ed74ff5fbc069bae2f85ca9
 
     public function getDebugInfo()
     {
-        return array (  152 => 64,  144 => 60,  142 => 59,  139 => 58,  135 => 56,  131 => 54,  129 => 53,  117 => 43,  111 => 41,  107 => 39,  105 => 38,  98 => 33,  89 => 30,  86 => 29,  82 => 28,  75 => 23,  66 => 20,  63 => 19,  59 => 18,  51 => 13,  45 => 10,  39 => 7,  34 => 5,  31 => 4,  28 => 3,);
+        return array (  153 => 65,  145 => 61,  143 => 60,  140 => 59,  136 => 57,  132 => 55,  130 => 54,  117 => 43,  111 => 41,  107 => 39,  105 => 38,  98 => 33,  89 => 30,  86 => 29,  82 => 28,  75 => 23,  66 => 20,  63 => 19,  59 => 18,  51 => 13,  45 => 10,  39 => 7,  34 => 5,  31 => 4,  28 => 3,);
     }
 }

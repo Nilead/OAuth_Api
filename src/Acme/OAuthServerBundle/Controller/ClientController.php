@@ -12,7 +12,6 @@
 
 namespace Acme\OAuthServerBundle\Controller;
 
-use GuzzleHttp\Client;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Orm\EntityManager;
@@ -76,14 +75,18 @@ class ClientController extends Controller
          */
         if ($request->isMethod('POST')) {
             $permission = $request->request->get('choice_access');
-            $uri = $this->buildAuthenCodeURI($client, $permission);
 
             /**
              * Redirect user to OAuth server for user Auth code
              * This URI can be sent to user as a notification
              */
 
-            return $this->redirect($uri);
+            return $this->container->get('oauth_requester')->redirectAuthCode(
+                $client->getPublicId(),
+                $client->getSecret(),
+                $client->getRedirectUris()[0],
+                $permission
+            );
         }
 
         $json = null;
@@ -92,13 +95,19 @@ class ClientController extends Controller
          * User comeback from OAuth server by Client's Redirect-uri with Auth code
          */
         if ($code != null) {
-            $uri = $this->buildTokenURI($client, $code);
-            $token = $this->getToken($request->getHost() . $uri);
+            $token = $this->container->get('oauth_requester')->requestTokenFromAuthCode(
+                $client->getPublicId(),
+                $client->getSecret(),
+                $client->getRedirectUris()[0],
+                $code
+            );
 
-            $currUserID = $this->container->get('security.context')->getToken()->getUser()->getId();
+            $currUserID = $this->getUser()->getId();
 
-            $apiURI = $this->buildAPIURI($currUserID, $token);
-            $json = $this->getJSONInfo($request->getHost() . $apiURI);
+            $json = $this->container->get('api_requester')->requestUser(
+                $currUserID,
+                $token
+            );
         }
 
         return $this->render(
@@ -108,99 +117,5 @@ class ClientController extends Controller
                 'json' => $json
             )
         );
-    }
-
-    /**
-     * Generate URL for redirect user to OAuth server
-     *
-     * @param EntityClient $client
-     * @param string       $permission
-     *
-     * @return string
-     */
-    private function buildAuthenCodeURI(EntityClient $client, $permission)
-    {
-        return $this->generateUrl(
-            'fos_oauth_server_authorize',
-            array(
-                'client_id' => $client->getPublicId(),
-                'redirect_uri' => $client->getRedirectUris()[0],
-                'client_secret' => $client->getSecret(),
-                'response_type' => 'code',
-                'scope' => $permission,
-            )
-        );
-    }
-
-    /**
-     * Generate URL for retrieve token from OAuth server
-     *
-     * @param EntityClient $client
-     * @param string       $code
-     *
-     * @return string
-     */
-    private function buildTokenURI(EntityClient $client, $code)
-    {
-        return $this->generateUrl(
-            'fos_oauth_server_token',
-            array(
-                'client_id' => $client->getPublicId(),
-                'redirect_uri' => $client->getRedirectUris()[0],
-                'client_secret' => $client->getSecret(),
-                'grant_type' => 'authorization_code',
-                'code' => $code,
-            )
-        );
-    }
-
-    /**
-     * Generate URL for retrieve information from API endpoint
-     *
-     * @param int    $userId
-     * @param string $token
-     *
-     * @return string
-     */
-    private function buildAPIURI($userId, $token)
-    {
-        return $this->generateUrl(
-            'get_user',
-            array(
-                'userID' => $userId,
-                'access_token' => $token,
-            )
-        );
-    }
-
-    /**
-     * Get Token from OAuth server by presenting Auth Code
-     *
-     * @param string $uri
-     *
-     * @return string
-     */
-    private function getToken($uri)
-    {
-        $http = new Client();
-        $res = $http->get($uri);
-        $token = json_decode($res->getBody())->{'access_token'};
-
-        return $token;
-    }
-
-    /**
-     * Get JSON string from API Endpoint
-     *
-     * @param $uri
-     *
-     * @return \GuzzleHttp\Stream\StreamInterface|null
-     */
-    private function getJSONInfo($uri)
-    {
-        $http = new Client();
-        $res = $http->get($uri);
-
-        return $res->getBody(true);
     }
 }

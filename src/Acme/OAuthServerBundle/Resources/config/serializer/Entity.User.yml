@@ -4,3 +4,7 @@ Acme\OAuthServerBundle\Entity\User:
     id:
         expose: true
         groups: [ROLE_ID_ACCESS, ROLE_ALL_ACCESS]
+
+    dob:
+        expose: true
+        groups: [ROLE_DOB_ACCESS, ROLE_ALL_ACCESS]

@@ -1,7 +1,22 @@
 parameters:
-#    o_auth_server.example.class: Acme\OAuthServerBundle\Example
+    oauth_requester_class: Acme\OAuthServerBundle\Requester\OAuthRequester
+    oauth_server_host: 'http://tuanvuong.local/'
+    api_requester_class: Acme\OAuthServerBundle\Requester\APIRequester
+    api_server_host: 'http://tuanvuong.local/'
 
 services:
-#    o_auth_server.example:
-#        class: %o_auth_server.example.class%
-#        arguments: [@service_id, "plain_value", %parameter%]
+    oauth_requester:
+        class: %oauth_requester_class%
+        arguments:
+            router: @router
+            host: %oauth_server_host%
+        tags:
+            - { name: oauth.requester }
+
+    api_requester:
+        class: %api_requester_class%
+        arguments:
+            router: @router
+            host: %api_server_host%
+        tags:
+            - {name:api.requester}

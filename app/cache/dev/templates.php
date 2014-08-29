@@ -112,6 +112,7 @@
   'OAuthServerBundle:Client:index.html.twig' => 'C:\\Users\\Mr_Idiot\\PhpstormProjects\\OAuth\\src\\Acme\\OAuthServerBundle/Resources/views/Client/index.html.twig',
   'OAuthServerBundle:Default:index.html.twig' => 'C:\\Users\\Mr_Idiot\\PhpstormProjects\\OAuth\\src\\Acme\\OAuthServerBundle/Resources/views/Default/index.html.twig',
   'OAuthServerBundle:User:index.html.twig' => 'C:\\Users\\Mr_Idiot\\PhpstormProjects\\OAuth\\src\\Acme\\OAuthServerBundle/Resources/views/User/index.html.twig',
+  'OAuthServerBundle:User:update.html.twig' => 'C:\\Users\\Mr_Idiot\\PhpstormProjects\\OAuth\\src\\Acme\\OAuthServerBundle/Resources/views/User/update.html.twig',
   'WebProfilerBundle:Collector:config.html.twig' => 'C:\\Users\\Mr_Idiot\\PhpstormProjects\\OAuth\\vendor\\symfony\\symfony\\src\\Symfony\\Bundle\\WebProfilerBundle/Resources/views/Collector/config.html.twig',
   'WebProfilerBundle:Collector:events.html.twig' => 'C:\\Users\\Mr_Idiot\\PhpstormProjects\\OAuth\\vendor\\symfony\\symfony\\src\\Symfony\\Bundle\\WebProfilerBundle/Resources/views/Collector/events.html.twig',
   'WebProfilerBundle:Collector:exception.css.twig' => 'C:\\Users\\Mr_Idiot\\PhpstormProjects\\OAuth\\vendor\\symfony\\symfony\\src\\Symfony\\Bundle\\WebProfilerBundle/Resources/views/Collector/exception.css.twig',

@@ -19,7 +19,8 @@ security:
         api:
             pattern: ^/api
             fos_oauth: true
-            stateless: true
+            stateless: false
+            context: main_context
 
         main:
             pattern: ^/
@@ -31,6 +32,7 @@ security:
                             path: /logout
                             target: /
             anonymous: true
+            context: main_context
 
         dev:
             pattern:  ^/(_(profiler|wdt)|css|images|js)/

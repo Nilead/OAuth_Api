@@ -2,6 +2,7 @@
 
 {% block body %}
     <h1>Demo page</h1>
+    <a href="{{ path('get_free_to_access') }}">Test API Session Access</a><br>
     Available Client:
     <div>
         <ul>
@@ -13,7 +14,6 @@
         </ul>
     </div>
     <div><a href="{{ path('user') }}">User profile</a></div>
-    <div><a href="{{ path('fos_user_registration_register') }}">User register</a></div>
 
     {% if app.user %}
         <a href="{{ path('fos_user_security_logout') }}">
